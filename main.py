@@ -316,37 +316,55 @@ def send_template_message(
     to_user: str,
     message: Dict[str, str],
 ) -> None:
-    content = "\n\n".join([
-        f"时间：{message['date']}",
-        f"城市：{message['city']}",
-        f"今日晚间天气：\n{message['tonight_weather']}",
-        f"明日天气情况：\n{message['tomorrow_weather']}",
-        f"当前温度：\n{message['temperature']}",
-        f"穿衣建议：\n{message['clothing_advice']}",
-        f"暖心一句：\n{message['warm_word']}",
-        f"鼓励一句：\n{message['encourage_word']}",
-        f"搞怪一句：\n{message['funny_word']}",
-        f"诗句版本：\n{message['poem']}",
-        f"每日情话：\n{message['love_word']}",
-    ])
+    template_values = {
+        "date": message["date"],
+        "region": message["city"],
+        "weather": "\n".join([
+            "今日晚间天气：",
+            message["tonight_weather"],
+            "",
+            "明日天气情况：",
+            message["tomorrow_weather"],
+        ]),
+        "temp": message["temperature"],
+        "wind_dir": "风向风力见当前温度详情，出门注意体感变化。",
+        "love_day": "认真生活、被温柔对待的每一天",
+        "birthday1": "\n".join([
+            "穿衣建议：",
+            message["clothing_advice"],
+        ]),
+        "birthday2": "\n".join([
+            "暖心一句：",
+            message["warm_word"],
+        ]),
+        "note_en": "\n".join([
+            "鼓励一句：",
+            message["encourage_word"],
+            "",
+            "搞怪一句：",
+            message["funny_word"],
+        ]),
+        "note_ch": "\n".join([
+            "诗句版本：",
+            message["poem"],
+            "",
+            "每日情话：",
+            message["love_word"],
+            "",
+            message["remark"],
+        ]),
+    }
 
     data = {
         "touser": to_user,
         "template_id": config["template_id"],
         "url": "",
         "data": {
-            "title": {
-                "value": message["first"],
+            key: {
+                "value": value,
                 "color": "#173177",
-            },
-            "content": {
-                "value": content,
-                "color": "#173177",
-            },
-            "remark": {
-                "value": message["remark"],
-                "color": "#173177",
-            },
+            }
+            for key, value in template_values.items()
         },
     }
 
