@@ -71,6 +71,7 @@ def load_config() -> Dict[str, Any]:
         "app_secret": require_env("WECHAT_APP_SECRET"),
         "template_id": require_env("WECHAT_TEMPLATE_ID"),
         "weather_key": require_env("QWEATHER_KEY"),
+        "weather_host": os.getenv("QWEATHER_HOST", "devapi.qweather.com").strip() or "devapi.qweather.com",
         "region": os.getenv("REGION", "长沙市").strip() or "长沙市",
         "receiver_name": os.getenv("RECEIVER_NAME", "苏苏姐").strip() or "苏苏姐",
         "users": users,
@@ -114,7 +115,7 @@ def get_access_token(config: Dict[str, Any]) -> str:
 
 def get_location_id(config: Dict[str, Any]) -> Tuple[str, str]:
     data = request_json(
-        "https://geoapi.qweather.com/v2/city/lookup",
+        f"https://{config['weather_host']}/geo/v2/city/lookup",
         params={
             "location": config["region"],
             "key": config["weather_key"],
@@ -131,7 +132,7 @@ def get_location_id(config: Dict[str, Any]) -> Tuple[str, str]:
 
 def get_weather_now(config: Dict[str, Any], location_id: str) -> Dict[str, Any]:
     data = request_json(
-        "https://devapi.qweather.com/v7/weather/now",
+        f"https://{config['weather_host']}/v7/weather/now",
         params={
             "location": location_id,
             "key": config["weather_key"],
@@ -148,7 +149,7 @@ def get_weather_now(config: Dict[str, Any], location_id: str) -> Dict[str, Any]:
 
 def get_weather_3d(config: Dict[str, Any], location_id: str) -> List[Dict[str, Any]]:
     data = request_json(
-        "https://devapi.qweather.com/v7/weather/3d",
+        f"https://{config['weather_host']}/v7/weather/3d",
         params={
             "location": location_id,
             "key": config["weather_key"],
