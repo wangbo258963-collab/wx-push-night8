@@ -316,6 +316,22 @@ def send_template_message(
     to_user: str,
     message: Dict[str, str],
 ) -> None:
+    template_values = {
+        "first": message["first"],
+        "keyword1": message["date"],
+        "keyword2": message["city"],
+        "keyword3": message["tonight_weather"],
+        "keyword4": message["tomorrow_weather"],
+        "keyword5": message["temperature"],
+        "keyword6": message["clothing_advice"],
+        "keyword7": message["warm_word"],
+        "keyword8": message["encourage_word"],
+        "keyword9": message["funny_word"],
+        "keyword10": message["poem"],
+        "keyword11": message["love_word"],
+        "remark": message["remark"],
+    }
+
     data = {
         "touser": to_user,
         "template_id": config["template_id"],
@@ -325,7 +341,7 @@ def send_template_message(
                 "value": value,
                 "color": "#173177",
             }
-            for key, value in message.items()
+            for key, value in template_values.items()
         },
     }
 
