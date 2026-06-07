@@ -316,32 +316,37 @@ def send_template_message(
     to_user: str,
     message: Dict[str, str],
 ) -> None:
-    template_values = {
-        "first": message["first"],
-        "keyword1": message["date"],
-        "keyword2": message["city"],
-        "keyword3": message["tonight_weather"],
-        "keyword4": message["tomorrow_weather"],
-        "keyword5": message["temperature"],
-        "keyword6": message["clothing_advice"],
-        "keyword7": message["warm_word"],
-        "keyword8": message["encourage_word"],
-        "keyword9": message["funny_word"],
-        "keyword10": message["poem"],
-        "keyword11": message["love_word"],
-        "remark": message["remark"],
-    }
+    content = "\n\n".join([
+        f"时间：{message['date']}",
+        f"城市：{message['city']}",
+        f"今日晚间天气：\n{message['tonight_weather']}",
+        f"明日天气情况：\n{message['tomorrow_weather']}",
+        f"当前温度：\n{message['temperature']}",
+        f"穿衣建议：\n{message['clothing_advice']}",
+        f"暖心一句：\n{message['warm_word']}",
+        f"鼓励一句：\n{message['encourage_word']}",
+        f"搞怪一句：\n{message['funny_word']}",
+        f"诗句版本：\n{message['poem']}",
+        f"每日情话：\n{message['love_word']}",
+    ])
 
     data = {
         "touser": to_user,
         "template_id": config["template_id"],
         "url": "",
         "data": {
-            key: {
-                "value": value,
+            "title": {
+                "value": message["first"],
                 "color": "#173177",
-            }
-            for key, value in template_values.items()
+            },
+            "content": {
+                "value": content,
+                "color": "#173177",
+            },
+            "remark": {
+                "value": message["remark"],
+                "color": "#173177",
+            },
         },
     }
 
@@ -356,7 +361,6 @@ def send_template_message(
         raise PushError(f"模板消息发送失败：{result}")
 
     print(f"发送成功：{mask_openid(to_user)}")
-
 
 def mask_openid(openid: str) -> str:
     if len(openid) <= 8:
