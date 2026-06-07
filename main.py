@@ -310,61 +310,29 @@ def build_message(config: Dict[str, Any]) -> Dict[str, str]:
     }
 
 
-def send_template_message(
-    config: Dict[str, Any],
+def short_text(text: str, max_len: int = 90) -> str:
+    text = str(text).replace("• ", "").strip()
+    if len(text) <= max_len:
+        return text
+    return text[:max_len] + "..."
+
+
+def send_one_template(
     access_token: str,
     to_user: str,
-    message: Dict[str, str],
+    template_id: str,
+    values: Dict[str, str],
 ) -> None:
-    template_values = {
-        "date": message["date"],
-        "region": message["city"],
-        "weather": "\n".join([
-            "今日晚间天气：",
-            message["tonight_weather"],
-            "",
-            "明日天气情况：",
-            message["tomorrow_weather"],
-        ]),
-        "temp": message["temperature"],
-        "wind_dir": "风向风力见当前温度详情，出门注意体感变化。",
-        "love_day": "认真生活、被温柔对待的每一天",
-        "birthday1": "\n".join([
-            "穿衣建议：",
-            message["clothing_advice"],
-        ]),
-        "birthday2": "\n".join([
-            "暖心一句：",
-            message["warm_word"],
-        ]),
-        "note_en": "\n".join([
-            "鼓励一句：",
-            message["encourage_word"],
-            "",
-            "搞怪一句：",
-            message["funny_word"],
-        ]),
-        "note_ch": "\n".join([
-            "诗句版本：",
-            message["poem"],
-            "",
-            "每日情话：",
-            message["love_word"],
-            "",
-            message["remark"],
-        ]),
-    }
-
     data = {
         "touser": to_user,
-        "template_id": config["template_id"],
+        "template_id": template_id,
         "url": "",
         "data": {
             key: {
                 "value": value,
                 "color": "#173177",
             }
-            for key, value in template_values.items()
+            for key, value in values.items()
         },
     }
 
@@ -377,6 +345,63 @@ def send_template_message(
 
     if result.get("errcode") != 0:
         raise PushError(f"模板消息发送失败：{result}")
+
+
+def send_template_message(
+    config: Dict[str, Any],
+    access_token: str,
+    to_user: str,
+    message: Dict[str, str],
+) -> None:
+    weather_template_id = os.getenv("WECHAT_TEMPLATE_ID_WEATHER", "").strip() or config["template_id"]
+    advice_template_id = os.getenv("WECHAT_TEMPLATE_ID_ADVICE", "").strip() or config["template_id"]
+    words_template_id = os.getenv("WECHAT_TEMPLATE_ID_WORDS", "").strip() or config["template_id"]
+
+    # 第一条：天气
+    send_one_template(
+        access_token,
+        to_user,
+        weather_template_id,
+        {
+            "date": message["date"],
+            "region": message["city"],
+            "weather": short_text(message["tonight_weather"], 80),
+            "temp": short_text(message["tomorrow_weather"], 90),
+            "wind_dir": short_text(message["temperature"], 80),
+            "note_ch": "今晚记得看天气，早点休息呀。",
+        },
+    )
+
+    # 第二条：穿衣建议
+    send_one_template(
+        access_token,
+        to_user,
+        advice_template_id,
+        {
+            "date": message["date"],
+            "region": message["city"],
+            "weather": short_text(message["clothing_advice"], 150),
+            "temp": "下雨带伞，早晚注意温差，淋雨后及时换干衣服。",
+            "note_ch": "照顾好自己，比什么都重要。",
+        },
+    )
+
+    # 第三条：晚安文案
+    send_one_template(
+        access_token,
+        to_user,
+        words_template_id,
+        {
+            "date": message["date"],
+            "region": f"{config['receiver_name']}晚安小纸条",
+            "weather": short_text(message["warm_word"], 70),
+            "temp": short_text(message["encourage_word"], 70),
+            "wind_dir": short_text(message["funny_word"], 70),
+            "birthday1": short_text(message["poem"], 60),
+            "birthday2": short_text(message["love_word"], 70),
+            "note_ch": message["remark"],
+        },
+    )
 
     print(f"发送成功：{mask_openid(to_user)}")
 

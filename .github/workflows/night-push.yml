@@ -34,6 +34,9 @@ jobs:
           WECHAT_APP_ID: ${{ secrets.WECHAT_APP_ID }}
           WECHAT_APP_SECRET: ${{ secrets.WECHAT_APP_SECRET }}
           WECHAT_TEMPLATE_ID: ${{ secrets.WECHAT_TEMPLATE_ID }}
+          WECHAT_TEMPLATE_ID_WEATHER: ${{ secrets.WECHAT_TEMPLATE_ID_WEATHER }}
+          WECHAT_TEMPLATE_ID_ADVICE: ${{ secrets.WECHAT_TEMPLATE_ID_ADVICE }}
+          WECHAT_TEMPLATE_ID_WORDS: ${{ secrets.WECHAT_TEMPLATE_ID_WORDS }}
           WECHAT_USER_OPENIDS: ${{ secrets.WECHAT_USER_OPENIDS }}
           QWEATHER_KEY: ${{ secrets.QWEATHER_KEY }}
           QWEATHER_HOST: ma7p448rrg.re.qweatherapi.com
