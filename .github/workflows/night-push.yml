@@ -36,6 +36,7 @@ jobs:
           WECHAT_TEMPLATE_ID: ${{ secrets.WECHAT_TEMPLATE_ID }}
           WECHAT_USER_OPENIDS: ${{ secrets.WECHAT_USER_OPENIDS }}
           QWEATHER_KEY: ${{ secrets.QWEATHER_KEY }}
+          QWEATHER_HOST: ${{ vars.QWEATHER_HOST }}
           REGION: ${{ vars.REGION || '长沙市' }}
           RECEIVER_NAME: ${{ vars.RECEIVER_NAME || '苏苏姐' }}
         run: python main.py
